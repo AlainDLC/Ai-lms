@@ -1,4 +1,5 @@
 "use client";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@heroui/button";
 import {
   Navbar,
@@ -35,6 +36,8 @@ function Header() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const { user, isSignedIn } = useUser();
+
   return (
     <Navbar maxWidth="full" onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
@@ -60,7 +63,12 @@ function Header() {
         ))}
       </NavbarContent>
       <NavbarContent justify="end">
-        <Button color="primary">Get Started</Button>
+        <UserButton />
+        <Link href={"/dashboard"}>
+          <Button color="primary">
+            {isSignedIn ? "Dashboard" : "Get Started"}
+          </Button>
+        </Link>
       </NavbarContent>
       <NavbarMenu>
         {MenyList.map((item, index) => (
