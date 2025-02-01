@@ -11,7 +11,7 @@ function Hero() {
           <h2 className="text-[70px] text-primary font-extrabold">
             Craft Magical Stories for kids in Minutes
           </h2>
-          <p className="text-2xl text-primary font-light">
+          <p className="text-2xl text-primary font-light mt-2">
             Create fun and personalised stories that bring your child's
             adventures to life and spark their passion for reading. It only
             takes a few seconds!🐦‍🔥
@@ -22,7 +22,7 @@ function Hero() {
             </Button>
           </Link>
         </div>
-        <div className="p-1">
+        <div className="">
           <Image src={"/story.png"} alt="story" height={200} width={500} />
         </div>
       </div>
