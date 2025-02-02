@@ -39,7 +39,11 @@ function Header() {
   const { user, isSignedIn } = useUser();
 
   return (
-    <Navbar maxWidth="full" onMenuOpenChange={setIsMenuOpen}>
+    <Navbar
+      maxWidth="full"
+      onMenuOpenChange={setIsMenuOpen}
+      className="overflow-hidden"
+    >
       <NavbarContent>
         <NavbarMenuToggle
           className="sm:hidden"

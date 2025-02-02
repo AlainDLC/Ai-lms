@@ -28,6 +28,7 @@ function StoryType() {
       <div className="grid grid-cols-3 gap-4 mt-5  ">
         {OptionList.map((item, index) => (
           <div
+            key={item.label}
             className={`relative grayscale hover:grayscale-0 cursor-pointer  ${
               selecteOption === item.label
                 ? "grayscale-0 border-5 rounded-3xl border-blue-300"
