@@ -1,7 +1,8 @@
 import Image from "next/image";
 import React, { useState } from "react";
+import { OptionField, StoryTypeProps } from "./interface";
 
-function AgeGroup() {
+function AgeGroup({ userSelection }: StoryTypeProps) {
   const OptionList = [
     {
       label: "0-2 Years",
@@ -20,6 +21,14 @@ function AgeGroup() {
     },
   ];
 
+  const onUserSelect = (item: OptionField) => {
+    setSelectedOption(item.label);
+    userSelection({
+      fieldValue: item?.label,
+      fieldName: "ageGroup",
+    });
+  };
+
   const [selecteOption, setSelectedOption] = useState<string>();
   return (
     <div>
@@ -33,7 +42,7 @@ function AgeGroup() {
                 ? "grayscale-0 border-5 rounded-3xl border-blue-300"
                 : "grayscale"
             } `}
-            onClick={() => setSelectedOption(item.label)}
+            onClick={() => onUserSelect(item)}
           >
             <h2 className="absolute bottom-6 text-center w-full text-primary-50 text-2xl ">
               {item.label}

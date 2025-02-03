@@ -1,18 +1,21 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import StorySubjectInput from "./_components/StorySubjectInput";
 import StoryType from "./_components/StoryType";
 import AgeGroup from "./_components/AgeGroup";
 import ImageStyle from "./_components/ImageStyle";
+import { Button } from "@heroui/button";
+import { fieldData, formDataType } from "./_components/interface";
 
-interface fieldData {
-  fieldValue: string;
-  fieldName: string;
-}
+function CreateStory() {
+  const [formData, setFormData] = useState<formDataType>();
 
-function page() {
   const onHandleUserSelection = (data: fieldData) => {
-    console.log(data);
+    setFormData((prev: any) => ({
+      ...prev,
+      [data.fieldName]: data.fieldValue,
+    }));
+    console.log(formData);
   };
   return (
     <div className="p-10 md:px-20 lg:px-40">
@@ -25,12 +28,17 @@ function page() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-14">
         <StorySubjectInput userSelection={onHandleUserSelection} />
-        <StoryType />
-        <AgeGroup />
-        <ImageStyle />
+        <StoryType userSelection={onHandleUserSelection} />
+        <AgeGroup userSelection={onHandleUserSelection} />
+        <ImageStyle userSelection={onHandleUserSelection} />
+      </div>
+      <div className="flex justify-end my-10">
+        <Button color="primary" className="p-10 text-2xl">
+          Generate Story
+        </Button>
       </div>
     </div>
   );
 }
 
-export default page;
+export default CreateStory;

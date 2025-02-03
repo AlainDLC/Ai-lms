@@ -1,7 +1,9 @@
+import { fieldset } from "framer-motion/client";
 import Image from "next/image";
 import React, { useState } from "react";
+import { OptionField, StoryTypeProps } from "./interface";
 
-function StoryType() {
+function StoryType({ userSelection }: StoryTypeProps) {
   const OptionList = [
     {
       label: "Story Book",
@@ -21,6 +23,14 @@ function StoryType() {
   ];
 
   const [selecteOption, setSelectedOption] = useState<string>();
+
+  const onUserSelect = (item: OptionField) => {
+    setSelectedOption(item.label);
+    userSelection({
+      fieldValue: item?.label,
+      fieldName: "storyType",
+    });
+  };
   return (
     <div>
       <label className="font-bold text-4xl text-primary  ">2. Story Type</label>
@@ -33,7 +43,7 @@ function StoryType() {
                 ? "grayscale-0 border-5 rounded-3xl border-blue-300"
                 : "grayscale"
             } `}
-            onClick={() => setSelectedOption(item.label)}
+            onClick={() => onUserSelect(item)}
           >
             <h2 className="absolute bottom-6 text-center w-full text-primary-50 text-2xl ">
               {item.label}
