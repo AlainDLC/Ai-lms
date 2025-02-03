@@ -6,6 +6,9 @@ import AgeGroup from "./_components/AgeGroup";
 import ImageStyle from "./_components/ImageStyle";
 import { Button } from "@heroui/button";
 import { fieldData, formDataType } from "./_components/interface";
+import { chatSession } from "@/config/GeminiAi";
+
+const CREATE_STORY_PROPMT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 
 function CreateStory() {
   const [formData, setFormData] = useState<formDataType>();
@@ -16,6 +19,22 @@ function CreateStory() {
       [data.fieldName]: data.fieldValue,
     }));
     console.log(formData);
+  };
+
+  const GenerateStory = async () => {
+    const FINAL_PROPMT = CREATE_STORY_PROPMT?.replace(
+      "{ageGroup}",
+      formData?.ageGroup ?? ""
+    )
+      .replace("{storyType}", formData?.storyType ?? "")
+      .replace("{storySubject}", formData?.storySubject ?? "")
+      .replace("{imageStyle}", formData?.imageStyle ?? "");
+    try {
+      console.log(FINAL_PROPMT);
+      // const result = await chatSession.sendMessage();
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <div className="p-10 md:px-20 lg:px-40">
@@ -33,7 +52,11 @@ function CreateStory() {
         <ImageStyle userSelection={onHandleUserSelection} />
       </div>
       <div className="flex justify-end my-10">
-        <Button color="primary" className="p-10 text-2xl">
+        <Button
+          color="primary"
+          className="p-10 text-2xl"
+          onPress={GenerateStory}
+        >
           Generate Story
         </Button>
       </div>

@@ -30,7 +30,7 @@ function ImageStyle({ userSelection }: StoryTypeProps) {
     setSelectedOption(item.label);
     userSelection({
       fieldValue: item?.label,
-      fieldName: "ImageStyle",
+      fieldName: "imageStyle",
     });
   };
 
