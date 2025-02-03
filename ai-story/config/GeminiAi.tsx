@@ -1,5 +1,3 @@
-import "./envConfig.ts";
-
 const {
   GoogleGenerativeAI,
   HarmCategory,

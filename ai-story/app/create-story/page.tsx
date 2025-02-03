@@ -7,11 +7,15 @@ import ImageStyle from "./_components/ImageStyle";
 import { Button } from "@heroui/button";
 import { fieldData, formDataType } from "./_components/interface";
 import { chatSession } from "@/config/GeminiAi";
+import { db } from "@/config/db";
+import { StoryData } from "@/config/schema";
+import uuid4 from "uuid4";
 
 const CREATE_STORY_PROPMT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 
 function CreateStory() {
   const [formData, setFormData] = useState<formDataType>();
+  const [loading, setLoading] = useState(false);
 
   const onHandleUserSelection = (data: fieldData) => {
     setFormData((prev: any) => ({
@@ -22,6 +26,7 @@ function CreateStory() {
   };
 
   const GenerateStory = async () => {
+    setLoading(true);
     const FINAL_PROPMT = CREATE_STORY_PROPMT?.replace(
       "{ageGroup}",
       formData?.ageGroup ?? ""
@@ -31,9 +36,37 @@ function CreateStory() {
       .replace("{imageStyle}", formData?.imageStyle ?? "");
     try {
       console.log(FINAL_PROPMT);
-      // const result = await chatSession.sendMessage();
+      const result = await chatSession.sendMessage(FINAL_PROPMT);
+      console.log(result?.response.text());
+      const resp = await SaveInDb(result?.response.text());
+      console.log(resp);
+      setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
+    }
+  };
+
+  const SaveInDb = async (output: string) => {
+    var recordId = uuid4();
+    setLoading(true);
+    try {
+      const result = await db
+        .insert(StoryData)
+        .values({
+          storyId: recordId,
+          ageGroup: formData?.ageGroup,
+          imageStyle: formData?.imageStyle,
+          storySubject: formData?.storySubject,
+          storyType: formData?.storyType,
+          output: JSON.parse(output),
+        })
+        .returning({ storyId: StoryData?.storyId });
+      setLoading(false);
+      return result;
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
     }
   };
   return (
@@ -53,6 +86,7 @@ function CreateStory() {
       </div>
       <div className="flex justify-end my-10">
         <Button
+          disabled={loading}
           color="primary"
           className="p-10 text-2xl"
           onPress={GenerateStory}
