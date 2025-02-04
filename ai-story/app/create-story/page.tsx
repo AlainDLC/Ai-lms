@@ -11,12 +11,15 @@ import { db } from "@/config/db";
 import { StoryData } from "@/config/schema";
 import uuid4 from "uuid4";
 import CustomLoader from "./_components/CustomLoader";
+import axios from "axios";
 
 const CREATE_STORY_PROPMT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 
 function CreateStory() {
   const [formData, setFormData] = useState<formDataType>();
   const [loading, setLoading] = useState(false);
+
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const onHandleUserSelection = (data: fieldData) => {
     setFormData((prev: any) => ({
@@ -27,7 +30,6 @@ function CreateStory() {
   };
 
   const GenerateStory = async () => {
-    setLoading(true);
     const FINAL_PROPMT = CREATE_STORY_PROPMT?.replace(
       "{ageGroup}",
       formData?.ageGroup ?? ""
@@ -35,18 +37,58 @@ function CreateStory() {
       .replace("{storyType}", formData?.storyType ?? "")
       .replace("{storySubject}", formData?.storySubject ?? "")
       .replace("{imageStyle}", formData?.imageStyle ?? "");
+
     try {
-      console.log(FINAL_PROPMT);
+      setLoading(true);
+
+      // Skicka förfrågan till chatSession för att generera berättelsen
       const result = await chatSession.sendMessage(FINAL_PROPMT);
-      console.log(result?.response.text());
-      const resp = await SaveInDb(result?.response.text());
-      console.log(resp);
+      const responseText = result?.response?.text();
+
+      console.log("Svar från chatSession:", responseText);
+
+      if (responseText) {
+        try {
+          const story = JSON.parse(responseText);
+          console.log("Story data:", story);
+
+          if (story?.chapters && story.chapters.length > 0) {
+            const imageResp = await axios.post("/api/generate-image", {
+              prompt:
+                "Add text with title: " +
+                story.chapters[0]?.chapterTitle +
+                " in bold text for book cover " +
+                story.chapters[0]?.imagePrompt,
+            });
+
+            const imageUrl = imageResp?.data?.imageUrl;
+
+            if (imageUrl) {
+              // Skapa en fullständig bild-URL
+              const fullImageUrl = `${window.location.origin}${imageUrl}`;
+              setImageUrl(fullImageUrl); // Uppdatera state med fullständig URL
+              console.log("Fullständig bild-URL:", fullImageUrl);
+            } else {
+              console.log("Bild-URL saknas.");
+            }
+          } else {
+            console.log("Inga kapitel i den genererade berättelsen.");
+          }
+        } catch (jsonError) {
+          console.error("Fel vid JSON-parsning:", jsonError);
+        }
+      } else {
+        console.log("Inget textinnehåll i svaret från chatSession.");
+      }
+
       setLoading(false);
     } catch (err) {
-      console.log(err);
+      console.error("Fel vid generering av berättelse:", err);
       setLoading(false);
     }
   };
+
+  //  const resp = await SaveInDb(result?.response.text());
 
   const SaveInDb = async (output: string) => {
     var recordId = uuid4();
@@ -95,6 +137,18 @@ function CreateStory() {
           Generate Story
         </Button>
       </div>
+      <div className="flex justify-center mt-10">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Generated Story Cover"
+            className="max-w-full h-auto"
+          />
+        ) : (
+          <p>Generating image...</p>
+        )}
+      </div>
+
       <CustomLoader isLoading={loading} />
     </div>
   );
