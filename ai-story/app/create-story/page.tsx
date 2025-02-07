@@ -62,6 +62,7 @@ function CreateStory() {
             });
 
             const imageUrl = imageResp?.data?.imageUrl;
+            console.log(imageResp?.data);
 
             if (imageUrl) {
               // Skapa en fullständig bild-URL
@@ -138,14 +139,12 @@ function CreateStory() {
         </Button>
       </div>
       <div className="flex justify-center mt-10">
-        {imageUrl ? (
+        {imageUrl && (
           <img
             src={imageUrl}
             alt="Generated Story Cover"
             className="max-w-full h-auto"
           />
-        ) : (
-          <p>Generating image...</p>
         )}
       </div>
 
