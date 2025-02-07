@@ -62,16 +62,19 @@ function CreateStory() {
             });
 
             const imageUrl = imageResp?.data?.imageUrl;
+
             console.log(imageResp?.data);
 
+            let fullImageUrl = null;
             if (imageUrl) {
-              // Skapa en fullständig bild-URL
-              const fullImageUrl = `${window.location.origin}${imageUrl}`;
+              fullImageUrl = `${window.location.origin}${imageUrl}`;
               setImageUrl(fullImageUrl); // Uppdatera state med fullständig URL
               console.log("Fullständig bild-URL:", fullImageUrl);
             } else {
               console.log("Bild-URL saknas.");
             }
+
+            const resp = await SaveInDb(result?.response.text(), fullImageUrl);
           } else {
             console.log("Inga kapitel i den genererade berättelsen.");
           }
@@ -89,9 +92,7 @@ function CreateStory() {
     }
   };
 
-  //  const resp = await SaveInDb(result?.response.text());
-
-  const SaveInDb = async (output: string) => {
+  const SaveInDb = async (output: string, coverImage: string | null) => {
     var recordId = uuid4();
     setLoading(true);
     try {
@@ -104,8 +105,10 @@ function CreateStory() {
           storySubject: formData?.storySubject,
           storyType: formData?.storyType,
           output: JSON.parse(output),
+          coverImage: coverImage,
         })
         .returning({ storyId: StoryData?.storyId });
+
       setLoading(false);
       return result;
     } catch (err) {
@@ -137,15 +140,6 @@ function CreateStory() {
         >
           Generate Story
         </Button>
-      </div>
-      <div className="flex justify-center mt-10">
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt="Generated Story Cover"
-            className="max-w-full h-auto"
-          />
-        )}
       </div>
 
       <CustomLoader isLoading={loading} />
