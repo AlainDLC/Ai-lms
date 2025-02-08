@@ -9,17 +9,18 @@ import { fieldData, formDataType } from "./_components/interface";
 import { chatSession } from "@/config/GeminiAi";
 import { db } from "@/config/db";
 import { StoryData } from "@/config/schema";
-import uuid4 from "uuid4";
+import { v4 as uuid4 } from "uuid";
+
 import CustomLoader from "./_components/CustomLoader";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const CREATE_STORY_PROPMT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 
 function CreateStory() {
+  const router = useRouter();
   const [formData, setFormData] = useState<formDataType>();
   const [loading, setLoading] = useState(false);
-
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const onHandleUserSelection = (data: fieldData) => {
     setFormData((prev: any) => ({
@@ -53,6 +54,7 @@ function CreateStory() {
           console.log("Story data:", story);
 
           if (story?.chapters && story.chapters.length > 0) {
+            // Skapa en bild med API
             const imageResp = await axios.post("/api/generate-image", {
               prompt:
                 "Add text with title: " +
@@ -62,19 +64,21 @@ function CreateStory() {
             });
 
             const imageUrl = imageResp?.data?.imageUrl;
-
-            console.log(imageResp?.data);
+            console.log("Bild-API svar:", imageResp?.data);
 
             let fullImageUrl = null;
             if (imageUrl) {
               fullImageUrl = `${window.location.origin}${imageUrl}`;
-              setImageUrl(fullImageUrl); // Uppdatera state med fullständig URL
               console.log("Fullständig bild-URL:", fullImageUrl);
             } else {
               console.log("Bild-URL saknas.");
             }
 
-            const resp = await SaveInDb(result?.response.text(), fullImageUrl);
+            const storyId = uuid4();
+
+            await SaveInDb(storyId, responseText, fullImageUrl);
+
+            router.push(`/view-story/${storyId}`);
           } else {
             console.log("Inga kapitel i den genererade berättelsen.");
           }
@@ -91,15 +95,17 @@ function CreateStory() {
       setLoading(false);
     }
   };
-
-  const SaveInDb = async (output: string, coverImage: string | null) => {
-    var recordId = uuid4();
+  const SaveInDb = async (
+    storyId: string,
+    output: string,
+    coverImage: string | null
+  ) => {
     setLoading(true);
     try {
       const result = await db
         .insert(StoryData)
         .values({
-          storyId: recordId,
+          storyId: storyId,
           ageGroup: formData?.ageGroup,
           imageStyle: formData?.imageStyle,
           storySubject: formData?.storySubject,
@@ -112,7 +118,7 @@ function CreateStory() {
       setLoading(false);
       return result;
     } catch (err) {
-      console.log(err);
+      console.log("Fel vid sparande i databasen:", err);
       setLoading(false);
     }
   };

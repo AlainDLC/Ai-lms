@@ -8,6 +8,7 @@ import HTMLFlipBook from "react-pageflip";
 import BookCoverPage from "./_components/BookCoverPage";
 import StoryPages from "./_components/StoryPages";
 import LastPage from "./_components/LastPage";
+import { Button } from "@heroui/button";
 
 function ViewStory() {
   const [story, setStory] = useState<any>(null);
@@ -36,20 +37,24 @@ function ViewStory() {
         {story?.output?.storyTitle}
       </h2>
 
-      {/* @ts-ignore */}
-      <HTMLFlipBook width={500} height={500} showCover={true} className="mt-10">
-        <div>
-          <BookCoverPage imageUrl={story?.coverImage || ""} />
-        </div>
-        {[...Array(story?.output?.chapters?.length)].map((item, index) => (
-          <div key={index} className="bg-white p-10 border">
-            <StoryPages storyChapter={story?.output?.chapters[index]} />
+      <div className="relative">
+        {/* @ts-ignore */}
+        <HTMLFlipBook
+          width={500}
+          height={500}
+          showCover={true}
+          className="mt-10"
+        >
+          <div>
+            <BookCoverPage imageUrl={story?.coverImage || ""} />
           </div>
-        ))}
-        {/* <div>
-          <LastPage />
-        </div>*/}
-      </HTMLFlipBook>
+          {[...Array(story?.output?.chapters?.length)].map((item, index) => (
+            <div key={index} className="bg-white p-10 border">
+              <StoryPages storyChapter={story?.output?.chapters[index]} />
+            </div>
+          ))}
+        </HTMLFlipBook>
+      </div>
     </div>
   );
 }

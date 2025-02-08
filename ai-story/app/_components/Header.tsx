@@ -24,14 +24,6 @@ function Header() {
       name: "Create Story",
       path: "/create-story",
     },
-    {
-      name: "Explore Story",
-      path: "/explore-story",
-    },
-    {
-      name: "Contact Us",
-      path: "/contact-us",
-    },
   ];
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,18 +41,16 @@ function Header() {
           className="sm:hidden"
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
-        <NavbarBrand>
+        <NavbarBrand className="flex items-center gap-2">
           <Image src={"/pixe.svg"} alt="pixe" height={40} width={40} />
-          <h2 className="font-bold text-2xl text-primary ml-3 hidden sm:flex">
-            Kids Story
+          <h2 className="font-bold text-2xl text-primary hidden sm:flex">
+            Magic Story
           </h2>
         </NavbarBrand>
-      </NavbarContent>
-      <NavbarContent justify="center" className="hidden sm:flex">
         {MenyList.map((item, index) => (
           <NavbarItem
             key={index}
-            className="text-xl text-primary font-medium hover:underline mx-2 "
+            className="text-xl text-primary font-medium hover:underline"
           >
             <Link href={item.path}>{item.name}</Link>
           </NavbarItem>
